@@ -1,0 +1,11 @@
+1. MySQL
+DB Instance Identifier*	: mysql01instance
+Master Username*	    : kz1kirill1aol
+PWD : *18
+
+Endpoint: mysql01instance.clcb3ik2g7bw.eu-west-1.rds.amazonaws.com:3306 
+Database name : bubbling_dev1
+Database port : 3306
+
+Security group ID : sg-e6fefd80
+Security group name : rds-launch-wizard
