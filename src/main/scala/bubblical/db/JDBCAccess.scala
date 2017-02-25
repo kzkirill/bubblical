@@ -16,12 +16,10 @@ object JDBCAccess {
   connectionProperties.put("password", config.getString("db.password"))
   connectionProperties.put("driver", "com.mysql.jdbc.Driver")
 
-  private val table = "Events"
-
   private val mySqlURL = "jdbc:mysql://" + config.getString("db.host") + ":" + config.getString("db.port") + "/" + config.getString("db.schema")
 
 
-  def read(spark: SparkSession): DataFrame = {
+  def read(spark: SparkSession, table: String): DataFrame = {
     val jdbcDF = spark.read
       .jdbc(mySqlURL, table, connectionProperties)
     jdbcDF

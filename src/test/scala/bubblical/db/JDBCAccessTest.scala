@@ -1,19 +1,25 @@
 package bubblical.db
 
-import org.apache.spark.sql.SparkSession
+import bubblical.config.SparkLocal
+import bubblical.model.Event
 import org.scalatest.FunSuite
 
 /**
   * Created by Kirill on 2/18/2017.
   */
 class JDBCAccessTest extends FunSuite {
-  test("jdbc access test") {
-    val spark = SparkSession.builder().appName("JDBC acces driver test").master("local[4]") getOrCreate()
-    val dbDriver = JDBCAccess
+  val sparkSession = SparkLocal.scSession
+  val dbDriver = JDBCAccess
 
-    val df = dbDriver.read(spark)
+  test("jdbc access test table Events") {
 
-    df show
+    dbDriver.read(sparkSession, "Events").createOrReplaceTempView("Events")
+    val sqlDF = sparkSession.sql("select * from Events where action <> 'read'")
+    sqlDF.show
+
+    val rddEvent = sqlDF.rdd map (row => Event(row))
+
+    rddEvent foreach println
 
   }
 }
