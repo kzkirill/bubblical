@@ -26,12 +26,20 @@ class JDBCAccessTest extends FunSuite {
   }
 
   test("jdbc access test table small_session") {
-    val tableName = "small_session"
-    dbDriver.read(sparkSession, tableName).createOrReplaceTempView(tableName)
-    val sqlDF = sparkSession.sql("SELECT * FROM small_session")
-    sqlDF.show
+    val tableName = "small_session_stage"
+    testTable(tableName)
 
 
   }
 
+  test("jdbc access test table session") {
+    val tableName = "session"
+    testTable(tableName)
+  }
+
+  private def testTable(tableName: String) = {
+    dbDriver.read(sparkSession, tableName).createOrReplaceTempView(tableName)
+    val sqlDF = sparkSession.sql(s"SELECT * FROM $tableName")
+    sqlDF.show
+  }
 }
