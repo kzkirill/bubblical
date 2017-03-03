@@ -23,4 +23,6 @@ trait Events {
     (reduced collect) toMap
   }
 
+  object Events extends Events
+
 }

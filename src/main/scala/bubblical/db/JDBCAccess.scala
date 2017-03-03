@@ -7,7 +7,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 /**
   * Created by Kirill on 2/18/2017.
   */
-object JDBCAccess {
+object JDBCAccess extends Serializable{
 
   import bubblical.config.Context.config
 
