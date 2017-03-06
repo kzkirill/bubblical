@@ -2,11 +2,13 @@ package bubblical.web
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, get, onSuccess, pathPrefix}
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import bubblical.service.Sessions
+import spray.json._
 
 import scala.concurrent.Future
 import scala.io.StdIn
@@ -14,7 +16,14 @@ import scala.io.StdIn
 /**
   * Created by Kirill on 2/6/2017.
   */
-object WebServer {
+
+final case class JsonMap(member:Map[String, Double])
+
+trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
+  implicit val aggregationFormat = jsonFormat1(JsonMap)
+}
+
+object WebServer extends JsonSupport {
 
   def main(args: Array[String]) = {
     implicit val system = ActorSystem()
@@ -25,10 +34,9 @@ object WebServer {
 
     val route: Route = {
       get {
-        pathPrefix("aggregate" ) {
-          val sessionOption: Future[Option[String]] = Future {
-//            Some(sessions aggregate)
-            Some("adad")
+        pathPrefix("aggregate") {
+          val sessionOption: Future[Option[JsonMap]] = Future {
+            Some(JsonMap(sessions aggregate))
           }
 
           onSuccess(sessionOption) {

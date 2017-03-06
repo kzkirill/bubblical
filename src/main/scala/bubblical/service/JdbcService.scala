@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 /**
   * Created by kirill on 03/03/17.
   */
-abstract class JdbcService[T:ClassTag](val tableName: String, val model: Rowappliable[T]) extends Serializable{
+sealed class JdbcService[T: ClassTag](val tableName: String, val model: Rowappliable[T]) extends Serializable with RDDProvider[T] {
   val sparkSession = SparkLocal.scSession
   val dbDriver = JDBCAccess
 
