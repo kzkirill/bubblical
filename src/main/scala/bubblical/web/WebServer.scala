@@ -7,7 +7,6 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, get, onSuccess, pathPrefix}
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
-import bubblical.service.Sessions
 import spray.json._
 
 import scala.concurrent.Future
@@ -30,13 +29,13 @@ object WebServer extends JsonSupport {
     implicit val materialize = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
-    val sessions = Sessions()
+//    val sessions = Sessions()
 
     val route: Route = {
       get {
         pathPrefix("aggregate") {
           val sessionOption: Future[Option[JsonMap]] = Future {
-            Some(JsonMap(sessions aggregate))
+            None//Some(JsonMap(sessions aggregate))
           }
 
           onSuccess(sessionOption) {

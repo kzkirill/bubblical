@@ -7,7 +7,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 /**
   * Created by Kirill on 2/18/2017.
   */
-object JDBCAccess extends Serializable{
+object JDBCAccess extends Serializable {
 
   import bubblical.config.Context.config
 
@@ -20,9 +20,8 @@ object JDBCAccess extends Serializable{
 
 
   def read(spark: SparkSession, table: String): DataFrame = {
-    val jdbcDF = spark.read
+    spark.read
       .jdbc(mySqlURL, table, connectionProperties)
-    jdbcDF
   }
 
   def write(df: DataFrame): Unit = {

@@ -1,16 +1,37 @@
 package bubblical.model
 
-import org.apache.spark.sql.Row
 
+import java.time._
+
+import org.apache.spark.sql.Row
 
 /**
   * Created by Kirill on 3/2/2017.
   */
+/*root
+|-- ne_id: integer (nullable = true)
+|-- lastupdatetime: timestamp (nullable = true)
+|-- session_id: string (nullable = true)
+|-- start_time: timestamp (nullable = true)
+|-- stop_time: timestamp (nullable = true)
+|-- UPLOAD_KB: double (nullable = true)
+|-- DOWNLOAD_KB: double (nullable = true)
+|-- TOTAL_KB: double (nullable = true)
+|-- APN: string (nullable = true)
+|-- RAT: string (nullable = true)
+|-- imei: long (nullable = true)
+|-- ip_address: string (nullable = true)
+|-- CID: integer (nullable = true)
+|-- mcc: integer (nullable = true)
+|-- mnc: integer (nullable = true)*/
+
+
+
 case class Session(neid: Int,
-                   lastUpdateTime: Option[Long],
+                   lastUpdateTime: Option[LocalDateTime],
                    sessionid: String,
-                   startTime: Option[Long],
-                   stopTime: Option[Long],
+                   startTime: Option[LocalDateTime],
+                   stopTime: Option[LocalDateTime],
                    uploadKb: Double,
                    downloadKb: Double,
                    totalKb: Double,
@@ -61,8 +82,8 @@ object Session extends Rowappliable[Session] {
       row.getInt(cidPos),
       row.getInt(mccPos),
       row.getInt(mncPos))
-
   }
 }
+
 
 

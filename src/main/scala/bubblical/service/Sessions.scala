@@ -1,24 +1,30 @@
 package bubblical.service
 
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 import bubblical.model.Session
 
 /**
   * Created by kirill on 03/03/17.
   */
 
-sealed class Sessions(val rddProvider: RDDProvider[Session]) {
+sealed class Sessions(val dsProvider: RDDProvider[Session]) {
 
-  def this() = {
-    this(new JdbcService("session", Session))
-  }
+  val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+  val earliestDate = LocalDateTime.parse("2017-02-14 07:02", formatter)
 
-  def aggregate: Map[String,Double]= {
-    val reduced = rddProvider.read map (session => (session.ipAddress, session.downloadKb)) reduceByKey ((a, b) => a + b)
-    (reduced collect) toMap
+//  def this() = {
+//    this(new JdbcService("session"))
+//  }
+//
+  def aggregate: Map[String, Double] = {
+    val reduced = dsProvider.read
+    Map("as" -> 45.89)
   }
 
 }
 
-object Sessions {
-  def apply() = new Sessions
-}
+//object Sessions {
+//  def apply() = new Sessions
+//}
