@@ -2,6 +2,7 @@ package bubblical.model
 
 
 import java.time._
+import java.time.temporal.ChronoUnit
 
 import org.apache.spark.sql.Row
 
@@ -41,7 +42,9 @@ case class Session(neid: Int,
                    ipAddress: String,
                    cid: Int,
                    mcc: Int,
-                   mnc: Int) {
+                   mnc: Int,
+                   lastUpdateTimeToQuarter: Option[LocalDateTime],
+                   lastUpdateTimeToHour: Option[LocalDateTime]) {
 
 }
 
@@ -81,7 +84,9 @@ object Session extends Rowappliable[Session] {
       row.getString(ipAddressPos),
       row.getInt(cidPos),
       row.getInt(mccPos),
-      row.getInt(mncPos))
+      row.getInt(mncPos),
+      lastUpdateTime map (truncateToQuarter(_)),
+      lastUpdateTime map (_.truncatedTo(ChronoUnit.HOURS)))
   }
 }
 
