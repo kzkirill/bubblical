@@ -1,6 +1,7 @@
 package bubblical.service
 
 import bubblical.config.SparkLocal
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.functions._
 import org.scalatest.FunSuite
 
@@ -12,6 +13,9 @@ class SessionsTest extends FunSuite {
   implicit val spark = sparkSession
 
   import sparkSession.implicits._
+
+  val rootLogger = Logger.getRootLogger()
+  rootLogger.setLevel(Level.ERROR)
 
   test("jdbc reader") {
     //    implicit val encoder = Encoders.kryo[Session]
@@ -36,7 +40,6 @@ class SessionsTest extends FunSuite {
 
   test ("Sessions service test"){
     val service = new Sessions(new JdbcService("session"))
-
-    service.aggregate.show
+    service.aggregate(List("APN", "imei")).show(100)
   }
 }
