@@ -15,15 +15,18 @@ class SessionsTest extends FunSuite {
 
   test("jdbc reader") {
     //    implicit val encoder = Encoders.kryo[Session]
+    val datePattern = "yyyy-MM-dd HH:mm"
 
     val jdbcReader = new JdbcService("session")
     val sessionsDF = jdbcReader.read
     val downLoadColumn = column("DOWNLOAD_KB")
+    val stopTimeCol = nearestQuarterHourColumn("stop_time",datePattern)
     val columnNames = List("APN","imei")
-    val groupByColumns = columnNames.map(column(_))
-    val truncatedDate = expr("stop_time").
+    val groupByColumns = columnNames.map(column(_)) ++ List(stopTimeCol)
 
-    val aggregated = sessionsDF.select($"ne_id", $"session_id", $"UPLOAD_KB", downLoadColumn, $"TOTAL_KB", $"imei", $"ip_address", $"APN").
+    sessionsDF.printSchema()
+
+    val aggregated = sessionsDF.select($"ne_id", $"session_id", $"UPLOAD_KB", downLoadColumn, $"TOTAL_KB", $"imei", $"ip_address", $"APN", stopTimeCol, $"stop_time").
       groupBy(groupByColumns: _*).
       agg(sum(downLoadColumn).as("TotalDownload"), avg(downLoadColumn).as("AverageDownload")).
       sort(groupByColumns: _*)

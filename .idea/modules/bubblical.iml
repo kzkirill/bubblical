@@ -29,11 +29,11 @@
     <orderEntry type="library" name="SBT: io.netty:netty-common:4.0.33.Final:jar" level="project" />
     <orderEntry type="library" name="SBT: io.netty:netty-codec:4.0.33.Final:jar" level="project" />
     <orderEntry type="library" name="SBT: io.netty:netty-buffer:4.0.33.Final:jar" level="project" />
-    <orderEntry type="library" name="SBT: io.netty:netty:3.8.0.Final:jar" level="project" />
+    <orderEntry type="library" name="SBT: com.datastax.spark:spark-cassandra-connector_2.11:2.0.1:jar" level="project" />
     <orderEntry type="library" name="SBT: com.datastax.cassandra:cassandra-driver-core:3.0.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.netty:netty:3.8.0.Final:jar" level="project" />
     <orderEntry type="library" name="SBT: commons-collections:commons-collections:3.2.2:jar" level="project" />
     <orderEntry type="library" name="SBT: commons-beanutils:commons-beanutils:1.9.3:jar" level="project" />
-    <orderEntry type="library" name="SBT: com.datastax.spark:spark-cassandra-connector_2.11:2.0.1:jar" level="project" />
     <orderEntry type="library" name="SBT: org.scala-lang.modules:scala-xml_2.11:1.0.4:jar" level="project" />
     <orderEntry type="library" name="SBT: org.scala-lang:scalap:2.11.8:jar" level="project" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-reflect:2.11.8:jar" level="project" />

@@ -1,9 +1,8 @@
 package bubblical.db
 
-import bubblical.config.Context.config
-import com.datastax.spark.connector.writer.CassandraRowWriter.Factory
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
+import com.datastax.spark.connector._
+import com.datastax.spark.connector.cql.CassandraConnector
+import org.apache.spark.{SparkConf, SparkContext}
 import org.scalatest.FunSuite
 
 /**
@@ -12,30 +11,28 @@ import org.scalatest.FunSuite
 case class Aggregation(apn: String, imei: String, download_average: Double, download_total: Double)
 
 class CassandraAccessTest extends FunSuite {
-  /*
-    val sparkSession = SparkLocal.scSession
-    implicit val spark = sparkSession
-    implicit val sc = sparkSession.sparkContext
-  */
-  val url = config.getString("cassandra.url")
-  val sparkConf: SparkConf = new SparkConf().setAppName("Spark-cassandra-bubblical").setMaster("local[4]").set("spark.cassandra.connection.host", url)
+  val url = " 127.0.0.1"//config.getString("cassandra.url")
+  val port = "9042"
 
-  val spark = SparkSession.builder().config(sparkConf).getOrCreate()
+  val conf = new SparkConf(true)
+    .set("spark.cassandra.connection.host", url)
+    .set("spark.cassandra.connection.port", port)
+    .set("spark.cassandra.auth.username", "cassandra")
+    .set("spark.cassandra.auth.password", "cassandra")
 
-  implicit val sc = spark.sparkContext
+  val sc = new SparkContext("local[*]", "test", conf)
 
-  implicit val rowWriterFactory = Factory
-
-  test("Cassandra save") {
+  test("Cassandra access") {
     val tableName = "aggregations"
-    val tested = new CassandraAccess
-    val dataRDD = spark.sparkContext.parallelize(Seq(Aggregation("internetg", "3515830709328501", 1140.9648, 285.2412)))
-    tested.create(dataRDD, tableName)
+    val keySpace = "bubbling_dev_test_1"
 
-    /*
-        val collection = sc.parallelize(Seq(("cat", 30), ("fox", 40)))
-        collection.saveToCassandra("test", "words", SomeColumns("word", "count"))
-    */
+    implicit val sContext = sc
+
+    implicit val connector = CassandraConnector(conf)
+    val rdd = sc.cassandraTable(keySpace,tableName)
+
+    rdd.collect().foreach(println(_))
+
   }
 
 }
