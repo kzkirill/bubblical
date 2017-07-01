@@ -21,3 +21,7 @@ sealed class JdbcService(val tableName: String) extends Serializable with DFProv
   }
 
 }
+
+object JdbcService{
+  def apply(tableName: String) = new JdbcService(tableName)
+}

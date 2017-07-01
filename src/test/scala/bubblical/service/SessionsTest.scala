@@ -1,7 +1,11 @@
 package bubblical.service
 
+import java.time.LocalDateTime
+
 import bubblical.config.SparkLocal
+import bubblical.model.SessionAggregated
 import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.Encoders
 import org.apache.spark.sql.functions._
 import org.scalatest.FunSuite
 
@@ -12,34 +16,19 @@ class SessionsTest extends FunSuite {
   val sparkSession = SparkLocal.scSession
   implicit val spark = sparkSession
 
-  import sparkSession.implicits._
-
   val rootLogger = Logger.getRootLogger()
   rootLogger.setLevel(Level.ERROR)
 
-  test("jdbc reader") {
-    //    implicit val encoder = Encoders.kryo[Session]
-    val datePattern = "yyyy-MM-dd HH:mm"
-
-    val jdbcReader = new JdbcService("session")
-    val sessionsDF = jdbcReader.read
-    val downLoadColumn = column("DOWNLOAD_KB")
-    val stopTimeCol = nearestQuarterHourColumn("stop_time",datePattern)
-    val columnNames = List("APN","imei")
-    val groupByColumns = columnNames.map(column(_)) ++ List(stopTimeCol)
-
-    sessionsDF.printSchema()
-
-    val aggregated = sessionsDF.select($"ne_id", $"session_id", $"UPLOAD_KB", downLoadColumn, $"TOTAL_KB", $"imei", $"ip_address", $"APN", stopTimeCol, $"stop_time").
-      groupBy(groupByColumns: _*).
-      agg(sum(downLoadColumn).as("TotalDownload"), avg(downLoadColumn).as("AverageDownload")).
-      sort(groupByColumns: _*)
-
-    aggregated show
-  }
-
   test ("Sessions service test"){
-    val service = new Sessions(new JdbcService("session"))
-    service.aggregate(List("APN", "imei")).show(100)
+    import spark.implicits._
+
+    implicit val encoder1 = Encoders.kryo[SessionAggregated]
+    implicit val encoder2 = Encoders.kryo[LocalDateTime]
+
+    val service = Sessions(JdbcService("session"))
+    val aggregated = service.aggregate(List("APN", "imei"))
+    aggregated show(100)
+    val aggregatedRDD = aggregated map(row => SessionAggregated(row)) map (entry => ((entry.APN,entry.imei) -> entry))
+    aggregatedRDD show 20
   }
 }

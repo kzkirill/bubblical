@@ -35,9 +35,10 @@ sealed class Sessions(val dsProvider: DFProvider) {
     val sortColumns = groupByColumns ++ List(timeColumn )
 
 
+//    sessionsDF.select("*").where(column("imei").equalTo(3532960611056901l)) show 20
+
     val aggregatedQuarterHour = sessionsDF.select(quarterHourColumn.as(timeColumnName) :: aggColumn.as(aggColumnSumName) :: aggColumn.as(aggColumnAvgName) :: groupByColumns: _*)
       .where(timeColumnName + " is not null")
-      //.where(column("APN").equalTo("sphone")).where($"imei".equalTo("128390035507122"))
       .groupBy(quarterHourColumn.as(timeColumnName) :: groupByColumns: _*)
       .agg(sum(aggColumnSum).as(aggColumnSumName), avg(aggColumnAvg).as(aggColumnAvgName))
 
@@ -45,16 +46,16 @@ sealed class Sessions(val dsProvider: DFProvider) {
       groupBy(halfHourColumn.as(timeColumnName) :: groupByColumns: _*).
       agg(sum(aggColumnSum).as(aggColumnSumName), avg(aggColumnAvg).as(aggColumnAvgName))
 
-
-    val aa = aggregatedQuarterHour.sort(sortColumns: _*)
-    val bb = aggregatedHalfHour.sort(sortColumns: _*)
-    val aggregated = aggregatedQuarterHour
-      .union(aggregatedHalfHour)
-      .distinct
+//    val aggregated = aggregatedQuarterHour
+    val aggregated = aggregatedHalfHour
+      .union(aggregatedQuarterHour)
+      .dropDuplicates(timeColumnName :: groupColumnNames)
       .sort(sortColumns: _*)
-    aa.show(100)
-    bb.show(100)
     aggregated
   }
 
+}
+
+object Sessions{
+  def apply(dsProvider: DFProvider): Sessions = new Sessions(dsProvider)
 }
