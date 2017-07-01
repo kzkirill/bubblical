@@ -22,13 +22,13 @@ class SessionsTest extends FunSuite {
   test ("Sessions service test"){
     import spark.implicits._
 
-    implicit val encoder1 = Encoders.kryo[SessionAggregated]
-    implicit val encoder2 = Encoders.kryo[LocalDateTime]
+//    implicit val encoder1 = Encoders.kryo[SessionAggregated]
+//    implicit val encoder2 = Encoders.kryo[LocalDateTime]
 
     val service = Sessions(JdbcService("session"))
     val aggregated = service.aggregate(List("APN", "imei"))
     aggregated show(100)
-    val aggregatedRDD = aggregated map(row => SessionAggregated(row)) map (entry => ((entry.APN,entry.imei) -> entry))
-    aggregatedRDD show 20
+    val aggregatedRDD = aggregated map(row => SessionAggregated(row))
+    val keyValuesRDD = aggregatedRDD groupByKey (entry => (entry.APN,entry.imei, entry.stopTime))
   }
 }
