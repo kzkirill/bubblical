@@ -11,8 +11,9 @@ import org.scalatest.FunSuite
 case class Aggregation(apn: String, imei: String, download_average: Double, download_total: Double)
 
 class CassandraAccessTest extends FunSuite {
-  val url = " 127.0.0.1"//config.getString("cassandra.url")
-  val port = "9042"
+  val url = "52.215.24.146"//config.getString("cassandra.url")
+  val port = "9160"
+//  val port = "9042"
 
   val conf = new SparkConf(true)
     .set("spark.cassandra.connection.host", url)
@@ -29,8 +30,8 @@ class CassandraAccessTest extends FunSuite {
     implicit val sContext = sc
 
     implicit val connector = CassandraConnector(conf)
-    val rdd = sc.cassandraTable(keySpace,tableName)
 
+    val rdd = sc.cassandraTable(keySpace,tableName)
     rdd.collect().foreach(println(_))
 
   }

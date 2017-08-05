@@ -3,6 +3,8 @@ package bubblical.service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import bubblical.model.SessionAggregated
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions.{avg, column, sum}
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 
@@ -32,10 +34,10 @@ sealed class Sessions(val dsProvider: DFProvider) {
     val quarterHourColumn = nearestQuarterHourColumn(timeColumnName, datePattern)
     val halfHourColumn = nearestHalfHourColumn(timeColumnName, datePattern)
     val groupByColumns = groupColumnNames.map(column(_))
-    val sortColumns = groupByColumns ++ List(timeColumn )
+    val sortColumns = groupByColumns ++ List(timeColumn)
 
 
-//    sessionsDF.select("*").where(column("imei").equalTo(3532960611056901l)) show 20
+    //    sessionsDF.select("*").where(column("imei").equalTo(3532960611056901l)) show 20
 
     val aggregatedQuarterHour = sessionsDF.select(quarterHourColumn.as(timeColumnName) :: aggColumn.as(aggColumnSumName) :: aggColumn.as(aggColumnAvgName) :: groupByColumns: _*)
       .where(timeColumnName + " is not null")
@@ -46,7 +48,7 @@ sealed class Sessions(val dsProvider: DFProvider) {
       groupBy(halfHourColumn.as(timeColumnName) :: groupByColumns: _*).
       agg(sum(aggColumnSum).as(aggColumnSumName), avg(aggColumnAvg).as(aggColumnAvgName))
 
-//    val aggregated = aggregatedQuarterHour
+    //    val aggregated = aggregatedQuarterHour
     val aggregated = aggregatedHalfHour
       .union(aggregatedQuarterHour)
       .dropDuplicates(timeColumnName :: groupColumnNames)
@@ -54,6 +56,14 @@ sealed class Sessions(val dsProvider: DFProvider) {
     aggregated
   }
 
+  def reduce(aggregated: Dataset[Row])(implicit spark: SparkSession): RDD[((String, Long), List[SessionAggregated])] = {
+    import spark.implicits._
+    val aggregatedDS = aggregated map(row => {
+      val data = SessionAggregated(row)
+      ((data.APN, data.imei) -> List(data))
+    })
+    aggregatedDS.rdd.reduceByKey((entry1,entry2) => entry1 ++ entry2 )
+  }
 }
 
 object Sessions{
