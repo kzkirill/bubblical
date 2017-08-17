@@ -23,6 +23,7 @@ object OnSparkCluster {
     val service = Sessions(JdbcService("session"))
     val aggregated = service.aggregate(List("APN", "imei"))
     val keyValues = service.reduce(aggregated)
+/*
     keyValues
       .take(5).foreach{one =>
       val key = one._1
@@ -33,6 +34,7 @@ object OnSparkCluster {
         println(one)
       }
     }
+*/
   }
 
 }

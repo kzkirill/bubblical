@@ -4,8 +4,7 @@ import java.sql.Timestamp
 
 import bubblical.config.{SparkConfLocal, SparkLocalElastic}
 import bubblical.config.SparkLocal.conf
-import bubblical.model.{AggregatedListKey, SessionAggregated}
-import bubblical.model.SessionAggregated.SessionsAggregatedList
+import bubblical.model.{AggregatedListKey, SessionAggregated, SessionsAggregatedList}
 import org.apache.spark.sql.SparkSession
 import org.elasticsearch.spark._
 import org.scalatest.FunSuite
@@ -72,6 +71,7 @@ class ElasticTest extends FunSuite{
 
     rdd.saveToEsWithMeta("bubbling-dev1/aggregationIds")
     //http://localhost:9200/bubbling-dev1/aggregationIds/_search?q=8672580223070220
+    //http://localhost:9200/bubbling-dev1/aggregationIds/sphone8672580223070220
     val readRDD = sc.esRDD("bubbling-dev1/aggregationIds")
     readRDD.collect().foreach(println(_))
   }

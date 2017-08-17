@@ -3,7 +3,8 @@ package bubblical.service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-import bubblical.model.SessionAggregated
+import bubblical.model.{AggregatedListKey, SessionAggregated, SessionsAggregatedList}
+import bubblical.model.utils._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions.{avg, column, sum}
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
@@ -56,13 +57,14 @@ sealed class Sessions(val dsProvider: DFProvider) {
     aggregated
   }
 
-  def reduce(aggregated: Dataset[Row])(implicit spark: SparkSession): RDD[((String, Long), List[SessionAggregated])] = {
+  def reduce(aggregated: Dataset[Row])(implicit spark: SparkSession): RDD[(String, SessionsAggregatedList)] = {
     import spark.implicits._
     val aggregatedDS = aggregated map(row => {
       val data = SessionAggregated(row)
-      ((data.APN, data.imei) -> List(data))
+      val key = AggregatedListKey(data)
+      (produceId(data) -> SessionsAggregatedList(key,data))
     })
-    aggregatedDS.rdd.reduceByKey((entry1,entry2) => entry1 ++ entry2 )
+    aggregatedDS.rdd.reduceByKey((entry1,entry2) => reduceFun(entry1, entry2))
   }
 }
 

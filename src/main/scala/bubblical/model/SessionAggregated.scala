@@ -13,7 +13,6 @@ case class AggregatedListKey(apn:String,imei:Long)
 case class SessionsAggregatedList(key:AggregatedListKey,list:Seq[SessionAggregated])
 
 object SessionAggregated{
-//  def apply(stopTime: LocalDateTime,APN:String,imei: Long,DownLoadKBSum: Double,DownLoadKBAvg: Double) = new SessionAggregated(stopTime,APN,imei,DownLoadKBSum,DownLoadKBAvg)
   def apply(row:Row): SessionAggregated ={
     val stopTime:Timestamp = row.getAs[Timestamp]("stop_time")
     val apn:String = row.getAs[String]("APN")
@@ -22,10 +21,17 @@ object SessionAggregated{
     val dlKBAvg: Double = row.getAs[Double]("DOWNLOAD_KBAvg")
     new SessionAggregated(stopTime,apn,imei,dlKBSum,dlKBAvg)
   }
-
-  object SessionsAggregatedList{
-    def apply(key:AggregatedListKey,list:Seq[SessionAggregated]) = {
-      new SessionsAggregatedList(key,list)
-    }
-  }
 }
+
+object SessionsAggregatedList{
+  def apply(key:AggregatedListKey,oneEntry:SessionAggregated):SessionsAggregatedList = new SessionsAggregatedList(key,Seq(oneEntry))
+}
+object AggregatedListKey{
+  def apply(dataEntry:SessionAggregated) = new AggregatedListKey(dataEntry.APN,dataEntry.imei)
+}
+
+object utils {
+  def produceId(dataEntry: SessionAggregated) = dataEntry.APN + dataEntry.imei
+  def reduceFun(entry1: SessionsAggregatedList,entry2: SessionsAggregatedList) = SessionsAggregatedList(entry1.key, entry1.list ++ entry2.list )
+}
+

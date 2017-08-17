@@ -8,7 +8,7 @@ import org.elasticsearch.spark._
 /**
   * Created by kirill on 05/08/17.
   */
-object OnLocalMachine {
+object OnLocalMachineWithElastic {
   val sparkSession = SparkLocalElastic.scSession
   sparkSession.conf.set("es.resource", "bubbling-dev1/test1")
   implicit val spark = sparkSession
@@ -27,14 +27,14 @@ object OnLocalMachine {
       .take(5).foreach{one =>
       val key = one._1
       val values = one._2
-      println(key)
-      values.foreach{ one =>
+      println(key + " " + values.key)
+      values.list.foreach{ one =>
         print("   ")
         println(one)
       }
     }
 
-    keyValues.saveToEs("bubbling-dev1/aggregated")
+    keyValues.saveToEsWithMeta("bubbling-dev1/aggregated")
 
   }
 
