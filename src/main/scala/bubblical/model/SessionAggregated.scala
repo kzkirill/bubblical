@@ -9,6 +9,8 @@ import org.apache.spark.sql.Row
   * Created by kirill on 01/07/17.
   */
 case class SessionAggregated(stopTime: Timestamp,APN:String,imei: Long,DownLoadKBSum: Double,DownLoadKBAvg: Double)
+case class AggregatedListKey(apn:String,imei:Long)
+case class SessionsAggregatedList(key:AggregatedListKey,list:Seq[SessionAggregated])
 
 object SessionAggregated{
 //  def apply(stopTime: LocalDateTime,APN:String,imei: Long,DownLoadKBSum: Double,DownLoadKBAvg: Double) = new SessionAggregated(stopTime,APN,imei,DownLoadKBSum,DownLoadKBAvg)
@@ -19,5 +21,11 @@ object SessionAggregated{
     val dlKBSum: Double = row.getAs[Double]("DOWNLOAD_KBSum")
     val dlKBAvg: Double = row.getAs[Double]("DOWNLOAD_KBAvg")
     new SessionAggregated(stopTime,apn,imei,dlKBSum,dlKBAvg)
+  }
+
+  object SessionsAggregatedList{
+    def apply(key:AggregatedListKey,list:Seq[SessionAggregated]) = {
+      new SessionsAggregatedList(key,list)
+    }
   }
 }

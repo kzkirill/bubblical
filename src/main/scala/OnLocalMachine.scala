@@ -1,14 +1,16 @@
-import bubblical.config.SparkLocal
+import bubblical.config.{SparkLocal, SparkLocalElastic}
 import bubblical.service.{JdbcService, Sessions}
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import org.elasticsearch.spark._
 
 /**
   * Created by kirill on 05/08/17.
   */
 object OnLocalMachine {
-  val sparkSession = SparkLocal.scSession
+  val sparkSession = SparkLocalElastic.scSession
+  sparkSession.conf.set("es.resource", "bubbling-dev1/test1")
   implicit val spark = sparkSession
 
   val rootLogger = Logger.getRootLogger()
@@ -31,6 +33,9 @@ object OnLocalMachine {
         println(one)
       }
     }
+
+    keyValues.saveToEs("bubbling-dev1/aggregated")
+
   }
 
 
